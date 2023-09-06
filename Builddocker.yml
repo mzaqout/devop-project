@@ -1,0 +1,31 @@
+---
+- name: Build and push Docker image
+  hosts: localhost
+  gather_facts: False
+  become: true
+
+  tasks:
+    - name: Build the Docker image
+      docker_image:
+        name: tomcat
+        source: build
+        build:
+          path: /home/ubuntu/workspace/Java-Project-1/  # Replace with the directory containing your Dockerfile
+          pull: yes
+          nocache: yes
+        state: present
+        force_tag: yes
+
+    - name: Add tag to docker image
+      command: docker tag tomcat dignity26/my_tomcat_image
+
+    - name: Log in to Docker Hub
+      docker_login:
+        username: dignity26
+        password: Ajit$1994  # It's recommended to use Ansible vault to store sensitive information like passwords.
+
+    - name: Push the Docker image to Docker Hub
+      docker_image:
+        name: dignity26/my_tomcat_image:latest
+        source: local
+        push: yes
